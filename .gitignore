@@ -1,2 +1,11 @@
 *.dll 
 *.vcxproj
+CameraServer.opensdf
+CameraServer.sln
+CameraServer.sdf
+CameraServer.v12.suo
+CameraServer.vcxproj
+CameraServer.vcxproj
+Debug/CameraCapture.obj
+Debug/CameraServer.exe
+Debug/CameraServer.ilk

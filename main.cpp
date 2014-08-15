@@ -21,6 +21,8 @@ char   szAddress[128];
 
 void Listen();
 void CaptureCamera();
+DWORD WINAPI ClientThread(LPVOID lpParam);
+
 
 void main()
 {
@@ -110,9 +112,8 @@ void Listen()
 DWORD WINAPI ClientThread(LPVOID lpParam)
 {
 	SOCKET sock = (SOCKET)lpParam;
-	char szBuffer[DEFAULT_BUFFER];
-	int ret, nLeft, idx;
-
+	int ret, idx;
+	char szBuff[4];
 	IplImage* frame;
 
 	CvCapture* capture = cvCaptureFromCAM(0);
@@ -120,23 +121,28 @@ DWORD WINAPI ClientThread(LPVOID lpParam)
 	while (1)
 	{
 		frame = cvRetrieveFrame(capture);
-		
+		cvShowImage("cam", frame);
+		cvWaitKey(30);
 		char* frameData = (char*)frame->imageData;
-		int totalSize = frame->nSize;
+		int totalSize = frame->imageSize;
+		cout << "total size : " << totalSize << endl;
+		char sz[sizeof(int)];
+		memcpy(sz, &totalSize, sizeof(int));
 		idx = 0;
-		while (totalSize > 0)
-		{
-			ret = send(sock, &frameData[idx], nLeft, 0);
-			if (ret == 0)
-				break;
-			else if (ret == SOCKET_ERROR)
-			{
-				cout << "Send Error " << WSAGetLastError() << endl;
-				break;
-			}
-			totalSize -= ret;
-			idx += ret;
-		}
+		ret = send(sock, sz, sizeof(sz), 0);
+// 		while (totalSize > 0)
+// 		{
+// 			ret = send(sock, &frameData[idx], totalSize, 0);
+// 			if (ret == 0)
+// 				break;
+// 			else if (ret == SOCKET_ERROR)
+// 			{
+// 				cout << "Send Error " << WSAGetLastError() << endl;
+// 				break;
+// 			}
+// 			totalSize -= ret;
+// 			idx += ret;
+// 		}
 	}
 
 	cvReleaseCapture(&capture);
